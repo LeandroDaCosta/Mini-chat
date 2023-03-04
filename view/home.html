@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="https://cdn.socket.io/socket.io-3.0.1.min.js"></script> 
+</head>
+<body>
+    <h2>CHAT DA MOCAB</h2>
+    <input type="text" class="message"></input>
+    <button onclick="sendMessage()">Enviar mensagem </button>
+    
+    <div id="messages"></div> 
+    <div id="messages1"></div> 
+    <script>
+        const socket = io('http://localhost:5501')
+
+        socket.on('allMessages', (messages) => {
+            const messagesDiv = document.querySelector("#messages");
+            messagesDiv.innerHTML = "";
+            for (const message of messages) {
+                messagesDiv.innerHTML += `<p>${message}</p>`;
+             
+            }
+
+
+           
+        });
+
+        const sendMessage = () => {
+            // document.getElementById('messages1').innerHTML = " Enviada por: "+socket.id;
+            const messageInput = document.querySelector('.message')
+            const message = messageInput.value;
+            console.log(message)
+            socket.emit('message', message)
+            messageInput.value = "";
+           
+        }
+    </script>
+</body>
+</html>
