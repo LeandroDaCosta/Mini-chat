@@ -1,7 +1,7 @@
 # Mini-chat
 This is a simple chat between 2 clients using express, node.js e sockets.io
 
-#INSTRUCTIONS TO RUN THE PROJECT:
+# INSTRUCTIONS TO RUN THE PROJECT:
 
 1- Clone the repository
 
