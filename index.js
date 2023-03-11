@@ -1,36 +1,44 @@
-const { Console } = require('console');
 const express = require('express');
-const { Socket } = require('socket.io');
 const app = express();
-const server = require('http').createServer(app)
-const io = require('socket.io')(server, { cors: { origin: '*' } })
+const server = require('http').createServer(app);
+const io = require('socket.io')(server, { cors: { origin: '*' } });
 
-const messages = [];
+let messages = [];
+let users = [];
 
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/view/home.html');
-})
+});
 
 server.listen(5501, () => {
-    console.log("server a rodar")
-})
+    console.log("Servidor rodando na porta 5501");
+});
 
 io.on("connection", (socket) => {
-    console.log("usuario com o id " + socket.id)
+    console.log("Usuário conectado com o ID: " + socket.id);
 
-    socket.emit("allMessages", messages);
+    if (users.length < 2) {
+        users.push(socket.id);
+    } else {
+        socket.disconnect();
+        console.log("Usuário com o ID " + socket.id + " foi desconectado. Limite de 2 usuários alcançado.");
+        return;
+    }
 
-
+    // Envia todas as mensagens para o usuário recém-conectado
+    socket.emit('allMessages', messages);
 
     socket.on('disconnect', () => {
-        console.log('usario desconectado!');
-        console.log("usuario desconectado foi o "+socket.id)
-      });
-
+        console.log('Usuário desconectado com o ID: ' + socket.id);
+        const userIndex = users.indexOf(socket.id);
+        if (userIndex > -1) {
+            users.splice(userIndex, 1);
+        }
+    });
 
     socket.on("message", (data) => {
-        messages.push(data);
-        console.log("mensagem enviada por "+socket.id)
-        io.emit("allMessages ", messages);
+        messages.push({ user: socket.id, message: data });
+        console.log(`Mensagem enviada por ${socket.id}: ${data}`);
+        io.emit("allMessages", messages);
     });
 });
